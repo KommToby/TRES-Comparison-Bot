@@ -12,7 +12,7 @@ class OsuAuth:
         self._get_auth_token()
 
     def _load_config(self):
-        with open(os.path.dirname(__file__) + "/../config.json") as f:
+        with open("config.json") as f:
             data = json.load(f)['osu']
             self.address = data['address']
             self.apiv1_key = data['apiv1_key']

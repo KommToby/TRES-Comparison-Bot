@@ -4,7 +4,8 @@ import json
 import os
 
 from discord.ext import commands
-
+import database
+import osu_auth
 
 with open("config.json") as f:
     DISCORD_CONFIG_DATA = json.load(f)["discord"]
@@ -12,6 +13,8 @@ with open("config.json") as f:
 
 GUILD = None
 client = commands.Bot(command_prefix="-")
+DATABASE = database.Database()
+AUTH = osu_auth.OsuAuth()
 
 # called when bot is online
 @client.event
