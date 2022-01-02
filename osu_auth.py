@@ -61,16 +61,16 @@ class OsuAuth:
 
     # Specific User Data
     async def get_user_data(self, user_id: str):
-        return await self.get_api_v2(f"users/{user_id}")
+        return await self.get_api_v2(f"users/{user_id}/taiko")
     # Specific Score Data For User
     async def get_score_data(self, beatmap_id: str, user_id: str):
         return await self.get_api_v2(f"beatmaps/{beatmap_id}/scores/users/{user_id}")
     # Up To 5 Most Recent Score Data For User
     async def get_recent_plays(self, user_id: str):
-        return await self.get_api_v2(f"users/{user_id}/scores/recent?mode=osu")
+        return await self.get_api_v2(f"users/{user_id}/scores/recent?mode=taiko")
     # User Top Plays
     async def get_user_scores(self, user_id: str):
-        return await self.get_api_v2(f"users/{user_id}/scores/best")
+        return await self.get_api_v2(f"users/{user_id}/scores/best?mode=taiko")
     # Beatmap Data
     async def get_beatmap(self, beatmap_id: str):
         return await self.get_api_v2(f"beatmaps/{beatmap_id}")

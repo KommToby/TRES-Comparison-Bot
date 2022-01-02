@@ -1,6 +1,5 @@
 import sqlite3
 
-
 class Database:
     def __init__(self):
         self.db = sqlite3.connect('database.db')
@@ -31,7 +30,14 @@ class Database:
                 beatmap_id varchar(32) not null,
                 difficulty_rating varchar(32),
                 comparisons varchar(32),
-                new_rating varchar(32)
+                new_rating varchar(32),
+                bpm varchar(32),
+                length varchar(32),
+                artist varchar(32),
+                artist varchar(32),
+                title varchar(32),
+                difficulty_name varchar(32),
+                url varchar(32)
             )
         ''') # Specific beatmap 
 
@@ -45,6 +51,17 @@ class Database:
         ''') # Storing the comparison the user has been given so it doesnt have to always listen for a response
 
     # GETS
+    async def get_beatmap(self, id):
+        return self.cursor.execute(
+            "SELECT * FROM beatmaps WHERE beatmap_id=?",
+            (id,)
+        ).fetchone()
+
+    async def get_user(self, id):
+        return self.cursor.execute(
+            "SELECT osu_id FROM users WHERE discord_id=?",
+            (id,)
+        ).fetchone()
 
     # ADDS
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
@@ -54,11 +71,18 @@ class Database:
         )
         self.db.commit()
 
-    # UPDATES
-    async def update_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
+    async def add_beatmap(self, id, difficulty_rating, bpm, length, artist, title, difficulty_name, url):
         self.cursor.execute(
-            "UPDATE users SET osu_id=? AND osu_username=? AND rank=? AND difficulty=? AND playstyle=? AND comparisons=? WHERE discord_id=?",
-            (user_id, username, rank, sr, playstyle, comparisons, discord_id)
+            "INSERT INTO beatmaps VALUES(?,?,?,?,?,?,?,?,?,?)",
+            (id, difficulty_rating, 0, difficulty_rating, bpm, length, artist, title, difficulty_name, url)
+        )
+        self.db.commit()
+
+    # UPDATES
+    async def update_user(self, discord_id, user_id, username, rank, sr, playstyle):
+        self.cursor.execute(
+            "UPDATE users SET osu_id=?, osu_username=?, rank=?, difficulty=?, playstyle=? WHERE discord_id=?",
+            (user_id, username, rank, sr, playstyle, discord_id)
         )
         self.db.commit()
     # DELETES
