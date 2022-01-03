@@ -57,10 +57,27 @@ class Database:
             (id,)
         ).fetchone()
 
+    async def get_all_beatmaps(self):
+        return self.cursor.execute(
+            "SELECT * FROM beatmaps"
+        ).fetchall()       
+
     async def get_user(self, id):
         return self.cursor.execute(
-            "SELECT osu_id FROM users WHERE discord_id=?",
+            "SELECT * FROM users WHERE discord_id=?",
             (id,)
+        ).fetchone()
+
+    async def get_user_comparison(self, user_id, beatmap1, beatmap2):
+        return self.cursor.execute(
+            "SELECT * FROM comparisons WHERE osu_id=? AND first_beatmap_id=? AND second_beatmap_id=?",
+        (user_id, beatmap1, beatmap2)
+        ).fetchone()
+
+    async def get_playstyle(self, user_id):
+        return self.cursor.execute(
+            "SELECT playstyle FROM users WHERE discord_id=?",
+            (user_id,)
         ).fetchone()
 
     # ADDS
@@ -85,6 +102,14 @@ class Database:
             (user_id, username, rank, sr, playstyle, discord_id)
         )
         self.db.commit()
+
+    async def update_playstyle(self, discord_id, playstyle):
+        self.cursor.execute(
+            "UPDATE users SET playstyle=? WHERE discord_id=?",
+            (playstyle, discord_id)
+        )
+        self.db.commit()
+
     # DELETES
 
 

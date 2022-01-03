@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from bot import DATABASE, AUTH
+from bot import DATABASE, AUTH, suggestion
 
 class Start(commands.Cog): # must have commands.cog or this wont work
 
@@ -8,6 +8,7 @@ class Start(commands.Cog): # must have commands.cog or this wont work
         self.client = client
         self.database = DATABASE
         self.auth = AUTH
+        self.suggestion = suggestion
 
     @commands.Cog.listener() # event within the cog
     async def on_ready(self):
@@ -17,9 +18,12 @@ class Start(commands.Cog): # must have commands.cog or this wont work
     async def start(self, ctx):
         if isinstance(ctx.channel, discord.channel.DMChannel):
             user_discord_id = str(ctx.message.author.id)
-            if not(await self.database.get_user((user_discord_id,))):
+            if not(await self.database.get_user(user_discord_id)):
                 await ctx.send(f'You need to link your osu id first! use `-link`')
-
+            else:
+                await self.suggestion(ctx, user_discord_id)
+        else:
+            await ctx.send(f'<@{ctx.message.author.id}> Please use commands in DMs with me to prevent spam!')
 
 
 
