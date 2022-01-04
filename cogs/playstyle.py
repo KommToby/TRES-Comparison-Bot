@@ -34,8 +34,8 @@ class Playstyle(commands.Cog): # must have commands.cog or this wont work
                                 dcount = dcount+1
                             else:
                                 letters = False
-                            if kcount != 2 or dcount != 2:
-                                letters = False
+                        if kcount != 2 or dcount != 2:
+                            letters = False
                         if letters is True:
                             await self.database.update_playstyle(user_discord_id, args[0])
                             await ctx.send(f'Playstyle updated! Try doing `-start` to start map comparisons!')
@@ -43,13 +43,6 @@ class Playstyle(commands.Cog): # must have commands.cog or this wont work
                             await ctx.send(f'Please enter a valid playstyle (only two of each Ks and Ds, no spaces)!')
                     else:
                         await ctx.send(f'Please enter a valid playstyle (four characters of Ks and Ds, no spaces)')
-
-    async def average_sr_from_top(self, data):
-        average_sr = 0.00
-        for play in data:
-            average_sr = average_sr + play['beatmap']['difficulty_rating']
-        average_sr = average_sr / 5
-        return average_sr
 
 def setup(client):
     client.add_cog(Playstyle(client))

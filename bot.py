@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 import database
 import osu_auth
+import embed
 from help import Help
 
 with open("config.json") as f:
@@ -15,9 +16,10 @@ with open("config.json") as f:
     TOKEN = DISCORD_CONFIG_DATA["token"]
 
 GUILD = None
-client = commands.Bot(command_prefix="-", help_command=Help())
+client = commands.Bot(command_prefix="-", case_insensitive=True, help_command=Help())
 DATABASE = database.Database()
 AUTH = osu_auth.OsuAuth()
+EMBED = embed.Embed()
 
 # called when bot is online
 @client.event
@@ -55,7 +57,6 @@ async def suggestion(ctx, user_discord_id):
         beatmap_1_id = all_beatmaps[random_beatmap][0]
         beatmap_2_id = all_beatmaps[random_beatmap_2][0]
         if not(await DATABASE.get_user_comparison(local_user_data[1], beatmap_1_id, beatmap_2_id)):
-            await ctx.send(f'this is where the actual comparison would start, but komm hasnt programmed it yet :^)') # Post embed and save n all that TODO
             comparison_check = True
         else:
             comparison_counter = comparison_counter + 1
@@ -63,9 +64,13 @@ async def suggestion(ctx, user_discord_id):
     if comparison_counter >= 50:
         await ctx.send(f'Could not get a comparison for you at this time. Apparantly all of the possible comparisons you can do have been exhausted! Please contact an admin to confirm this')
     else:
-        pass #TODO
+        beatmap_1_data = await AUTH.get_beatmap(beatmap_1_id)
+        beatmap_2_data = await AUTH.get_beatmap(beatmap_2_id)
+        embed = await EMBED.create_comparison_embed(beatmap_1_data, beatmap_2_data)
+        comparison = await ctx.send(embed=embed)
+        await DATABASE.update_cache(user_discord_id, comparison.id, beatmap_1_id, beatmap_2_id)
 
-    await ctx.send(f'\n**__DEBUG DATA__** \nyour osu ign is {local_user_data[2]} - rank {local_user_data[3]} - average SR {local_user_data[4]} - total comparisons {local_user_data[6]} \nbeatmap_1_index: {random_beatmap}, id: {beatmap_1_id}\nbeatmap_2_index: {random_beatmap_2}, id: {beatmap_2_id}')
+    # await ctx.send(f'\n**__DEBUG DATA__** \nyour osu ign is {local_user_data[2]} - rank {local_user_data[3]} - average SR {local_user_data[4]} - total comparisons {local_user_data[6]} \nbeatmap_1_index: {random_beatmap}, id: {beatmap_1_id}\nbeatmap_2_index: {random_beatmap_2}, id: {beatmap_2_id}')
 
 
 #  must be final line

@@ -26,7 +26,7 @@ class Import(commands.Cog): # must have commands.cog or this wont work
             for line in f:
                 beatmap_id = line.strip()
                 beatmap_data = await self.auth.get_beatmap(str(beatmap_id))
-                if not(await self.database.get_beatmap((str(beatmap_id),))):
+                if not(await self.database.get_beatmap((str(beatmap_id)))):
                     await self.database.add_beatmap(str(beatmap_id), beatmap_data['difficulty_rating'], beatmap_data['bpm'], beatmap_data['total_length'], beatmap_data['beatmapset']['artist'], beatmap_data['beatmapset']['title'], beatmap_data['version'], beatmap_data['url'])
                 else:
                     await ctx.send(f'Error 0x01')

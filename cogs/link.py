@@ -27,8 +27,9 @@ class Link(commands.Cog): # must have commands.cog or this wont work
                             average_sr = await self.average_sr_from_top(best_plays)
                             discord_id = str(ctx.message.author.id)
                             user_database = await self.database.get_user( str(discord_id) )
-                            if not(user_database): # If the user has not linked before, add a new user to the database
+                            if not(user_database): # If the user has not linked before, add a new user to the database AND add a cache
                                 await self.database.add_user(discord_id, str(args[0]), user_data['username'], user_data['statistics']['global_rank'], average_sr, "", 0)
+                                await self.database.add_cache(discord_id)
                                 await ctx.send(f"user {user_data['username']} has successfully been linked to your discord account! Try doing `-start` to begin comparisons, or do `-playstyle` to update your playstyle!")
                                 print(f"Added {user_data['username']} as a user")
                             else: # Otherwise, update the users data in the database to the new osu account

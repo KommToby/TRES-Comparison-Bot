@@ -14,7 +14,7 @@ class Help(commands.HelpCommand): # must have commands.cog or this wont work
                 color=discord.Colour.red()
             )
             embed.add_field(name="Commands",
-                            value="`-link`: Links your discord account to your osu! account \n`-start`: Starts or continues (if you want to skip) taiko map comparison \n`-playstyle`: Adds your playstyle to the database (optional)",
+                            value="`-link`: Links your discord account to your osu! account \n`-start`: Starts or continues (if you want to skip) taiko map comparison \n`-playstyle`: Adds your playstyle to the database (optional) \n`-harder`: Picks which map of the two given is more difficult \n`-skip`: Skips the current comparison and generates a new one",
                             inline = False)
             await channel.send(embed=embed)
         else:
