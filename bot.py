@@ -4,6 +4,7 @@ import json
 import os
 import random
 import discord
+import asyncio
 
 from discord.ext import commands
 import database
@@ -25,10 +26,14 @@ EMBED = embed.Embed()
 @client.event
 async def on_ready():
     print("Connected")
-    await client.change_presence(activity=discord.Game(name="trying my best <3"))
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             client.load_extension(f"cogs.{filename[:-3]}")
+    while True:
+        await asyncio.sleep(60)
+        comparisons = DATABASE.get_all_comparisons()
+        num = (len(comparisons)/2)
+        await client.change_presence(activity=discord.Game(name=f"Now with {num} comparisons!"))
 
 
 @client.command(name="load")

@@ -74,6 +74,11 @@ class Database:
             (discord_id,)
         ).fetchone()
 
+    async def get_all_comparisons(self):
+        return self.cursor.execute(
+            "SELECT * FROM comparisons"
+        ).fetchall()
+
     async def get_user_comparison(self, user_id, beatmap1, beatmap2):
         return self.cursor.execute(
             "SELECT * FROM comparisons WHERE osu_id=? AND first_beatmap_id=? AND second_beatmap_id=?",
