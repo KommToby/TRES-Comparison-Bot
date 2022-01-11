@@ -12,7 +12,9 @@ class Database:
                 rank varchar(32),
                 difficulty varchar(32),
                 playstyle varchar(32),
-                comparisons varchar(32)
+                comparisons varchar(32),
+                confirmation varchar(16),
+                password varchar(16)
             )
         ''')  ## Storing user data
 
@@ -34,7 +36,6 @@ class Database:
                 bpm varchar(32),
                 length varchar(32),
                 artist varchar(32),
-                artist varchar(32),
                 title varchar(32),
                 difficulty_name varchar(32),
                 url varchar(32)
@@ -45,8 +46,16 @@ class Database:
             CREATE TABLE IF NOT EXISTS cache(
                 discord_id varchar(32) not null,
                 message_id varchar(32),
-                first_beatmap_id varchar(32),
-                second_beatmap_id varchar(32)
+                beatmap_0 varchar(32),
+                beatmap_1 varchar(32),
+                beatmap_2 varchar(32),
+                beatmap_3 varchar(32),
+                beatmap_4 varchar(32),
+                beatmap_5 varchar(32),
+                beatmap_6 varchar(32),
+                beatmap_7 varchar(32),
+                beatmap_8 varchar(32),
+                beatmap_9 varchar(32)
             )
         ''') # Storing the comparison the user has been given so it doesnt have to always listen for a response
 
@@ -112,8 +121,8 @@ class Database:
     # ADDS
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
         self.cursor.execute(
-            "INSERT INTO users VALUES(?,?,?,?,?,?,?)",
-            (discord_id, user_id, username, rank, sr, playstyle, comparisons)
+            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?)",
+            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "")
         )
         self.db.commit()
 
@@ -126,8 +135,8 @@ class Database:
 
     async def add_cache(self, id):
         self.cursor.execute(
-            "INSERT INTO cache VALUES(?,?,?,?)",
-            (id, "0", "0", "0")
+            "INSERT INTO cache VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+            (id, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0")
         )
         self.db.commit()
 
@@ -153,12 +162,30 @@ class Database:
         )
         self.db.commit()
 
-    async def update_cache(self, discord_id, message_id, beatmap_1_id, beatmap_2_id):
-        self.cursor.execute(
-            "UPDATE cache SET message_id=?, first_beatmap_id=?, second_beatmap_id=? WHERE discord_id=?",
-            (message_id, beatmap_1_id, beatmap_2_id, discord_id)
-        )
-        self.db.commit()
+    async def update_cache(self, discord_id, message_id, beatmaps):
+        if beatmaps == "":
+            self.cursor.execute(
+                "UPDATE cache SET message_id=?, beatmap_0=?, beatmap_1=?, beatmap_2=?, beatmap_3=?, beatmap_4=?, beatmap_5=?, beatmap_6=?, beatmap_7=?, beatmap_8=?, beatmap_9=? WHERE discord_id=?",
+                (message_id, '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', discord_id)
+            )
+            self.db.commit()
+        else:
+            b0 = beatmaps[0][0]
+            b1 = beatmaps[1][0]
+            b2 = beatmaps[2][0]
+            b3 = beatmaps[3][0]
+            b4 = beatmaps[4][0]
+            b5 = beatmaps[5][0]
+            b6 = beatmaps[6][0]
+            b7 = beatmaps[7][0]
+            b8 = beatmaps[8][0]
+            b9 = beatmaps[9][0]
+
+            self.cursor.execute(
+                "UPDATE cache SET message_id=?, beatmap_0=?, beatmap_1=?, beatmap_2=?, beatmap_3=?, beatmap_4=?, beatmap_5=?, beatmap_6=?, beatmap_7=?, beatmap_8=?, beatmap_9=? WHERE discord_id=?",
+                (message_id, b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, discord_id)
+            )
+            self.db.commit()
 
     async def update_comparisons(self, beatmap_id, comparisons):
         self.cursor.execute(
@@ -171,6 +198,20 @@ class Database:
         self.cursor.execute(
             "UPDATE users SET comparisons=? WHERE discord_id=?",
             (comparisons, discord_id)
+        )
+        self.db.commit()
+
+    async def start_confirmation(self, discord_id):
+        self.cursor.execute(
+            "UPDATE users SET confirmation=? WHERE discord_id=?",
+            ("1", discord_id)
+        )
+        self.db.commit()
+
+    async def update_password(self, discord_id, password):
+        self.cursor.execute(
+            "UPDATE users SET password=? WHERE discord_id=?",
+            (password, discord_id)
         )
         self.db.commit()
 

@@ -25,15 +25,19 @@ EMBED = embed.Embed()
 # called when bot is online
 @client.event
 async def on_ready():
+    i = 0
     print("Connected")
     for filename in os.listdir("./cogs"):
         if filename.endswith(".py"):
             client.load_extension(f"cogs.{filename[:-3]}")
     while True:
-        await asyncio.sleep(60)
-        comparisons = DATABASE.get_all_comparisons()
+        if i != 0:
+            await asyncio.sleep(60)
+        else:
+            i = 1
+        comparisons = await DATABASE.get_all_comparisons()
         num = (len(comparisons)/2)
-        await client.change_presence(activity=discord.Game(name=f"Now with {num} comparisons!"))
+        await client.change_presence(activity=discord.Game(name=f"Now with {int(num)} comparisons!"))
 
 
 @client.command(name="load")
@@ -50,32 +54,19 @@ async def unload(ctx, extension):
 
 # "Main" program stored in bot start file
 async def suggestion(ctx, user_discord_id):
-    local_user_data = await DATABASE.get_user(user_discord_id)
+    suggested_beatmaps = []
+    beatmaps_data = []
     all_beatmaps = await DATABASE.get_all_beatmaps()
-    comparison_check = False
-    comparison_counter = 0
-    while comparison_check == False and comparison_counter < 50:
+    for i in range(0, 10):
         random_beatmap = random.randint(0, (len(all_beatmaps)-1))
-        random_beatmap_2 = random_beatmap
-        while random_beatmap_2 == random_beatmap:
-            random_beatmap_2 = random.randint(0, (len(all_beatmaps)-1))
-        beatmap_1_id = all_beatmaps[random_beatmap][0]
-        beatmap_2_id = all_beatmaps[random_beatmap_2][0]
-        if not(await DATABASE.get_user_comparison(local_user_data[1], beatmap_1_id, beatmap_2_id)):
-            comparison_check = True
-        else:
-            comparison_counter = comparison_counter + 1
-            comparison_check = False
-    if comparison_counter >= 50:
-        await ctx.send(f'Could not get a comparison for you at this time. Apparantly all of the possible comparisons you can do have been exhausted! Please contact an admin to confirm this')
-    else:
-        beatmap_1_data = await AUTH.get_beatmap(beatmap_1_id)
-        beatmap_2_data = await AUTH.get_beatmap(beatmap_2_id)
-        embed = await EMBED.create_comparison_embed(beatmap_1_data, beatmap_2_data)
-        comparison = await ctx.send(embed=embed)
-        await DATABASE.update_cache(user_discord_id, comparison.id, beatmap_1_id, beatmap_2_id)
-
-    # await ctx.send(f'\n**__DEBUG DATA__** \nyour osu ign is {local_user_data[2]} - rank {local_user_data[3]} - average SR {local_user_data[4]} - total comparisons {local_user_data[6]} \nbeatmap_1_index: {random_beatmap}, id: {beatmap_1_id}\nbeatmap_2_index: {random_beatmap_2}, id: {beatmap_2_id}')
+        random_beatmap_data = all_beatmaps[random_beatmap]
+        suggested_beatmaps.append(random_beatmap_data)
+        all_beatmaps.remove(all_beatmaps[random_beatmap])
+        data = await AUTH.get_beatmap(random_beatmap_data[0])
+        beatmaps_data.append(data)
+    embed = await EMBED.create_comparison_embed(beatmaps_data)
+    comparison = await ctx.send(embed=embed)
+    await DATABASE.update_cache(user_discord_id, comparison.id, suggested_beatmaps)
 
 
 #  must be final line

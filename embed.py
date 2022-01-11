@@ -4,18 +4,37 @@ class Embed:
     def __init__(self):
         pass
 
-    async def create_comparison_embed(self, beatmap_1_data, beatmap_2_data):
-        beatmap_1_string = f"{beatmap_1_data['beatmapset']['title']} [{beatmap_1_data['version']}]"
-        beatmap_2_string = f"{beatmap_2_data['beatmapset']['title']} [{beatmap_2_data['version']}]"
-        beatmap_1_info = f"**Accuracy: {beatmap_1_data['accuracy']} - HP Drain: {beatmap_1_data['drain']} - BPM: {beatmap_1_data['bpm']}**"
-        beatmap_2_info = f"**Accuracy: {beatmap_2_data['accuracy']} - HP Drain: {beatmap_2_data['drain']} - BPM: {beatmap_2_data['bpm']}**"
+    async def create_comparison_embed(self, beatmaps_data):
+        description = ""
+        for i in range(0, 10):
+            description = description + f"{i}. [{beatmaps_data[i]['beatmapset']['title']} [{beatmaps_data[i]['version']}]]({beatmaps_data[i]['url']}) - {beatmaps_data[i]['difficulty_rating']}:star:\n\t**Accuracy: {beatmaps_data[i]['accuracy']} - HP Drain: {beatmaps_data[i]['drain']} - BPM: {beatmaps_data[i]['bpm']}**\n\n"
         ts = "=\t=\t=\t=\t=\t=\t" # tab string
 
         embed = discord.Embed(
             title="__Taiko Map Comparison__",
             color=discord.Colour.blue()
         )
-        embed.description = f":blue_circle: [{beatmap_1_string}]({beatmap_1_data['url']}) - {beatmap_1_data['difficulty_rating']}:star:\n\t{beatmap_1_info}\n\n:red_circle: [{beatmap_2_string}]({beatmap_2_data['url']}) - {beatmap_2_data['difficulty_rating']}:star:\n\t{beatmap_2_info}"
-        embed.add_field(name="Please choose which map you believe to be harder of the two above:",
-                        value=f"{ts}{ts}{ts}{ts}{ts}{ts}\n__**Commands**__\n`-harder 1` if :blue_circle: is harder\n`-harder 2` if :red_circle: is harder\n`-harder 0` if they are roughly the same difficulty.\n**take your time making your decision, every comparison makes a difference!**")
+        embed.description = description
+        embed.add_field(name="Please order the maps above in which you believe to be hardest -> easiest",
+                        value=f"{ts}{ts}{ts}{ts}{ts}{ts}\n__**Commands**__\n`-harder x x x x x x x x x x` where x is a number 0-9\n`-skip` if you want to skip this comparison and generate a new one.\n**take your time making your decision, every comparison makes a difference!**")
+        return embed
+
+    async def create_confirmation_embed(self, beatmaps_data, discord_id, password):
+        ts = "=\t=\t=\t=\t=\t=\t" # tab string
+        embed = discord.Embed(
+            title="__Confirmation Needed__",
+            color=discord.Colour.red()
+        )
+        description = ""
+        for i, beatmap in enumerate(beatmaps_data):
+            if i == 0:
+                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star: **<- (Hardest)**\n"
+            elif i == len(beatmaps_data)-1:
+                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star: **<- (Easiest)**\n"
+            else:
+                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star:\n"
+        description = description + f"{ts}{ts}{ts}{ts}{ts}{ts}"
+        embed.description = description
+        embed.add_field(name="Please confirm the order above is the order you have selected (hardest at the top, easiest at the bottom)",
+                        value=f"`There is no undo command. There is no going back after confirming!`\n**To retry:** use the `-harder` command again.\n**To confirm:** please write `-confirm {password}`" )
         return embed
