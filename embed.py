@@ -28,11 +28,11 @@ class Embed:
         description = ""
         for i, beatmap in enumerate(beatmaps_data):
             if i == 0:
-                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star: **<- (Hardest)**\n"
+                description = description + f"**{i}:** {beatmap['difficulty_rating']}☆: [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']})** <- (Hardest)**\n"
             elif i == len(beatmaps_data)-1:
-                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star: **<- (Easiest)**\n"
+                description = description + f"**{i}:** {beatmap['difficulty_rating']}☆: [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']})** <- (Easiest)**\n"
             else:
-                description = description + f"**{i}.** [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']}) - {beatmap['difficulty_rating']}:star:\n"
+                description = description + f"**{i}:** {beatmap['difficulty_rating']}☆: [{beatmap['beatmapset']['title']} [{beatmap['version']}]]({beatmap['url']})\n"
         description = description + f"{ts}{ts}{ts}{ts}{ts}{ts}"
         embed.description = description
         embed.add_field(name="Please confirm the order above is the order you have selected (hardest at the top, easiest at the bottom)",

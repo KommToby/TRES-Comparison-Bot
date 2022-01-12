@@ -64,35 +64,10 @@ class Harder(commands.Cog): # must have commands.cog or this wont work
                                 await self.database.update_password(user_discord_id, password)
                                 embed = await self.embed.create_confirmation_embed(beatmaps, user_discord_id, password)
                                 await ctx.send(embed=embed)
-
-
-
-                                osu_id = await self.database.get_user_osu_id(user_discord_id)
-                                osu_id = osu_id[0]
-                                parse_args = []
+                                order = ""
                                 for arg in arg_array:
-                                    parse_args.append(arg)
-                                for i, arg in enumerate(arg_array):
-                                    position = int(arg)+2
-                                    for k, p in enumerate(parse_args):
-                                        if arg != p:
-                                            second_position = int(p)+2
-                                            await self.database.add_comparison(osu_id, cache[position], cache[second_position], "1")
-                                            await self.database.add_comparison(osu_id, cache[second_position], cache[position], "2")
-                                    parse_args.remove(arg)
-
-                                for i, arg in enumerate(arg_array):
-                                    position = int(arg)+2
-                                    comparison = await self.database.get_beatmap_comparisons(cache[position])
-                                    comparison = int(comparison[0]) + 1
-                                    await self.database.update_comparisons(cache[position], str(comparison))
-                                user_comparisons = await self.database.get_user_comparisons(user_discord_id)
-                                user_comparisons = int(user_comparisons[0]) + 1
-                                await self.database.update_user_comparisons(user_discord_id, user_comparisons)
-                                await self.database.update_cache(user_discord_id, "0", [["0"],["0"],["0"],["0"],["0"],["0"],["0"],["0"],["0"],["0"]])
-                                await ctx.send(f"Comparison Successful. starting a new comparison..")
-                                await asyncio.sleep(1)
-                                await suggestion(ctx, user_discord_id)
+                                    order = order + str(arg)
+                                await self.database.update_order(user_discord_id, order)   
             else:
                 await ctx.send(f"You have not got a comparison to make! try doing `-start`")
 

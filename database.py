@@ -14,7 +14,8 @@ class Database:
                 playstyle varchar(32),
                 comparisons varchar(32),
                 confirmation varchar(16),
-                password varchar(16)
+                password varchar(16),
+                beatmap_order varchar(16)
             )
         ''')  ## Storing user data
 
@@ -121,8 +122,8 @@ class Database:
     # ADDS
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
         self.cursor.execute(
-            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?)",
-            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "")
+            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?)",
+            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "")
         )
         self.db.commit()
 
@@ -212,6 +213,13 @@ class Database:
         self.cursor.execute(
             "UPDATE users SET password=? WHERE discord_id=?",
             (password, discord_id)
+        )
+        self.db.commit()
+
+    async def update_order(self, discord_id, order):
+        self.cursor.execute(
+            "UPDATE users SET beatmap_order=? WHERE discord_id=?",
+            (order, discord_id)
         )
         self.db.commit()
 

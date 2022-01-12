@@ -36,8 +36,11 @@ async def on_ready():
         else:
             i = 1
         comparisons = await DATABASE.get_all_comparisons()
-        num = (len(comparisons)/2)
-        await client.change_presence(activity=discord.Game(name=f"Now with {int(num)} comparisons!"))
+        if comparisons:
+            num = (len(comparisons)/2)
+            await client.change_presence(activity=discord.Game(name=f"Now with {int(num)} comparisons!"))
+        else:
+            pass
 
 
 @client.command(name="load")
