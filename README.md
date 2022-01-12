@@ -5,9 +5,9 @@ TRES (Taiko Rework ELO System) Is a project co-ordinated by Lawtron and mangomiz
 `-link`: Links your discord account to your osu! account  
 `-start`: Starts a taiko map comparison (also works as a skip command)  
 `-playstyle`: Adds your playstyle to the database (optional)  
-`-harder`: Picks the order of maps from hardest to easiest
-`-skip`: Skips the current comparison and generates a new one
-`-confirm`: Confirms that the maps you have selected are in the right order
+`-harder`: Picks the order of maps from hardest to easiest  
+`-skip`: Skips the current comparison and generates a new one  
+`-confirm`: Confirms that the maps you have selected are in the right order  
 
 ## Bot Example
 ![](https://i.imgur.com/NygrhSk.png)
