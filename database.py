@@ -10,7 +10,7 @@ class Database:
                 osu_id varchar(32),
                 osu_username varchar(32),
                 rank varchar(32),
-                difficulty varchar(32),
+                elo_target varchar(32),
                 playstyle varchar(32),
                 comparisons varchar(32),
                 confirmation varchar(16),
@@ -113,6 +113,12 @@ class Database:
             (discord_id,)
         ).fetchone()
 
+    async def get_elo(self, discord_id):
+        return self.cursor.execute(
+            "SELECT elo_target FROM users WHERE discord_id=?",
+            (discord_id,)
+        ).fetchone()
+
     async def get_beatmap_comparisons(self, beatmap_id):
         return self.cursor.execute(
             "Select comparisons FROM beatmaps WHERE beatmap_id=?",
@@ -151,7 +157,7 @@ class Database:
     # UPDATES
     async def update_user(self, discord_id, user_id, username, rank, sr, playstyle):
         self.cursor.execute(
-            "UPDATE users SET osu_id=?, osu_username=?, rank=?, difficulty=?, playstyle=? WHERE discord_id=?",
+            "UPDATE users SET osu_id=?, osu_username=?, rank=?, elo_target=?, playstyle=? WHERE discord_id=?",
             (user_id, username, rank, sr, playstyle, discord_id)
         )
         self.db.commit()
@@ -160,6 +166,13 @@ class Database:
         self.cursor.execute(
             "UPDATE users SET playstyle=? WHERE discord_id=?",
             (playstyle, discord_id)
+        )
+        self.db.commit()
+
+    async def update_SR(self, discord_id, elo):
+        self.cursor.execute(
+            "UPDATE users SET elo_target=? WHERE discord_id=?",
+            (elo, discord_id)
         )
         self.db.commit()
 

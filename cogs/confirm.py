@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from bot import DATABASE, AUTH, suggestion
+from bot import DATABASE, AUTH, suggestion, ELO
 import asyncio
 
 class Confirm(commands.Cog): # must have commands.cog or this wont work
@@ -9,6 +9,7 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
         self.client = client
         self.database = DATABASE
         self.auth = AUTH
+        self.elo = ELO
 
     @commands.Cog.listener() # event within the cog
     async def on_ready(self):
@@ -47,6 +48,7 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
                                     second_position = int(p)+2
                                     await self.database.add_comparison(osu_id, cache[position], cache[second_position], "1")
                                     await self.database.add_comparison(osu_id, cache[second_position], cache[position], "2")
+                                    ELO.gameOver(winner=cache[position], loser=cache[second_position], winnerHome=False)
                             parse_args.remove(arg)
 
                         for i, arg in enumerate(arg_array):

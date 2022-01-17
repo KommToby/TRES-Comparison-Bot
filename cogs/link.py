@@ -30,11 +30,11 @@ class Link(commands.Cog): # must have commands.cog or this wont work
                             if not(user_database): # If the user has not linked before, add a new user to the database AND add a cache
                                 await self.database.add_user(discord_id, str(args[0]), user_data['username'], user_data['statistics']['global_rank'], average_sr, "", 0)
                                 await self.database.add_cache(discord_id)
-                                await ctx.send(f"user {user_data['username']} has successfully been linked to your discord account! Try doing `-start` to begin comparisons, or do `-playstyle` to update your playstyle!")
+                                await ctx.send(f"user {user_data['username']} has successfully been linked to your discord account! Try doing `-elo` before starting your comparisons!")
                                 print(f"Added {user_data['username']} as a user")
                             else: # Otherwise, update the users data in the database to the new osu account
                                 await self.database.update_user(discord_id, str(args[0]), user_data['username'], user_data['statistics']['global_rank'], average_sr, "")
-                                await ctx.send(f"user {user_data['username']} is now the osu! account linked to your discord account! Try doing `-start` to begin comparisons or do `-playstyle` to update your playstyle (it gets wiped when you update)")
+                                await ctx.send(f"user {user_data['username']} is now the osu! account linked to your discord account! Try doing `-elo` before starting your comparisons!")
                                 print(f"Updated {user_data['username']}'s data")
                         else:
                             await ctx.send(f'An error occured. This user has either not played taiko! enough, or there was an api issue. Please try again')

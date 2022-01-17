@@ -12,7 +12,7 @@ class Start(commands.Cog): # must have commands.cog or this wont work
 
     @commands.Cog.listener() # event within the cog
     async def on_ready(self):
-        print('Bot is online.')
+        print('Bot is online')
 
     @commands.command() # command within the cog
     async def start(self, ctx):
