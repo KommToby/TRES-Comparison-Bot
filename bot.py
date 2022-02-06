@@ -88,9 +88,11 @@ async def suggestion(ctx, user_discord_id):
     elo_upper = elo + 1.5
     elo_lower = elo - 1.5
 
+    l = 0 # THIS IS WHAT IS USED TO DETERMINE HOW MANY RANDOM MAPS THERE ARE!! AT PHASE 2 PLEASE TURN THIS TO 8
+
     target_beatmaps = []
     Count = 0
-    while Count < 8:
+    while Count < l:
         for i, beatmap in enumerate(elo_beatmaps):
             if float(beatmap[1]) > elo_upper or float(beatmap[1]) < elo_lower:
                 pass
@@ -98,7 +100,7 @@ async def suggestion(ctx, user_discord_id):
                 target_beatmaps.append(beatmap)
                 elo_beatmaps.remove(beatmap)
         Count = len(target_beatmaps)
-        if Count < 8:
+        if Count < l:
             elo_upper = elo_upper + 0.1
             if elo_lower < 0.1:
                 elo_lower = 0
@@ -106,7 +108,7 @@ async def suggestion(ctx, user_discord_id):
                 elo_lower = elo_lower - 0.1
 
     # Maps in target range - compared less
-    for i in range(0, 8):
+    for i in range(0, l):
         random_beatmap = random.randint(0, (len(target_beatmaps)-1))
         random_beatmap_data = target_beatmaps[random_beatmap]
         beatmaps_sorted = sorted(target_beatmaps, key=lambda x: x[2], reverse=True)
@@ -115,16 +117,37 @@ async def suggestion(ctx, user_discord_id):
         data = await AUTH.get_beatmap(random_beatmap_data[0])
         beatmaps_data.append(data)
 
+    # for a fix
+    beatmap_ids = []
+    for b in suggested_beatmaps:
+        beatmap_ids.append(b[0])
+
     # random maps that have been compared less
-    for i in range(0, 2):
+    for i in range(0, 10-l):
         beatmaps_not_added = []
         for beatmap in all_beatmaps:
-            if beatmap not in suggested_beatmaps:
+            if beatmap[0] not in beatmap_ids:
                 beatmaps_not_added.append(beatmap)
 
-        beatmaps_sorted = sorted(beatmaps_not_added, key=lambda x: x[2], reverse=False)
+    beatmaps_sorted = sorted(beatmaps_not_added, key=lambda x: x[2], reverse=False)
+    dupe = []
+    dupe_maps = [beatmaps_sorted[0]]
+    dupe.append(beatmaps_sorted[0][2])
+    for i, j in enumerate(beatmaps_sorted):
+        if j[2] in dupe:
+            dupe_maps.append(j)
+
+    if len(dupe_maps)>=(10-l):
+        random.shuffle(dupe_maps)
+        for k, o, in enumerate(dupe_maps):
+            if k < 10-l:
+                suggested_beatmaps.append(o)
+                data = await AUTH.get_beatmap(o[0])
+                beatmaps_data.append(data)
+
+    else:
         for i, j in enumerate(beatmaps_sorted):
-            if i < 5:
+            if i < 10-l:
                 suggested_beatmaps.append(j)
                 data = await AUTH.get_beatmap(j[0])
                 beatmaps_data.append(data)
