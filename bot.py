@@ -41,7 +41,8 @@ async def on_ready():
         comparisons = await DATABASE.get_all_comparisons()
         if comparisons:
             num = (len(comparisons)/2)
-            await client.change_presence(activity=discord.Game(name=f"{80-int(num/45)} user comparisons to go!"))
+            # await client.change_presence(activity=discord.Game(name=f"{100-int(num/45)} user comparisons to go!"))
+            await client.change_presence(activity=discord.Game(name=f"{100-int(num/45)} user comparisons to go!"))
         else:
             pass
 

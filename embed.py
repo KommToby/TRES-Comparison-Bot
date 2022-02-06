@@ -15,7 +15,7 @@ class Embed:
             color=discord.Colour.blue()
         )
         embed.description = description
-        embed.add_field(name="Please order the maps above in which you believe to be hardest -> easiest\nPlease remember Slider Velocity (SV) should not be taken into consideration for difficulty, Only mechanical skill.",
+        embed.add_field(name="Please order the maps above in which you believe to be hardest -> easiest\nIGNORE THE FOLLOWING: SV, OD, HP AND FINISHERS.",
                         value=f"{ts}{ts}{ts}{ts}{ts}{ts}\n__**Commands**__\n`-harder x x x x x x x x x x` where x is a number 0-9\n`-skip` if you want to skip this comparison and generate a new one.\n**take your time making your decision, every comparison makes a difference!**")
         embed.set_footer(text=f"Number of comparisons you have completed: {user_data[6]}")
         return embed
