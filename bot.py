@@ -131,7 +131,8 @@ async def suggestion(ctx, user_discord_id):
     if len(beatmaps_data) < 10:
         await ctx.send(f'An error occured when collecting beatmaps. Please try again')
     else:
-        embed = await EMBED.create_comparison_embed(beatmaps_data)
+        user_data = await DATABASE.get_user(user_discord_id)
+        embed = await EMBED.create_comparison_embed(beatmaps_data, user_data)
         comparison = await ctx.send(embed=embed)
         await DATABASE.update_cache(user_discord_id, comparison.id, suggested_beatmaps)
 

@@ -18,10 +18,14 @@ class Skip(commands.Cog): # must have commands.cog or this wont work
     async def skip(self, ctx):
         if isinstance(ctx.channel, discord.channel.DMChannel):
             user_discord_id = str(ctx.message.author.id)
-            await self.database.update_cache(user_discord_id, "0", "")
-            await ctx.send(f"Comparison skipped. Starting a new comparison..")
-            await asyncio.sleep(1)
-            await suggestion(ctx, user_discord_id)
+            if (await self.database.get_user(user_discord_id)):
+                await self.database.update_cache(user_discord_id, "0", "")
+                await ctx.send(f"Comparison skipped. Starting a new comparison..")
+                await asyncio.sleep(1)
+                await suggestion(ctx, user_discord_id)
+            else:
+                await ctx.send(f"Please use `-link`! The bot has been reset and/or you havent signed up yet!")
+                pass
 
 
 def setup(client):

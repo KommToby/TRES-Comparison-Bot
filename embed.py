@@ -4,7 +4,7 @@ class Embed:
     def __init__(self):
         pass
 
-    async def create_comparison_embed(self, beatmaps_data):
+    async def create_comparison_embed(self, beatmaps_data, user_data):
         description = ""
         for i in range(0, 10):
             description = description + f"{i}. [{beatmaps_data[i]['beatmapset']['title']} [{beatmaps_data[i]['version']}]]({beatmaps_data[i]['url']}) - {beatmaps_data[i]['difficulty_rating']}:star:\n\t**Accuracy: {beatmaps_data[i]['accuracy']} - HP Drain: {beatmaps_data[i]['drain']} - BPM: {beatmaps_data[i]['bpm']}**\n\n"
@@ -15,8 +15,9 @@ class Embed:
             color=discord.Colour.blue()
         )
         embed.description = description
-        embed.add_field(name="Please order the maps above in which you believe to be hardest -> easiest",
+        embed.add_field(name="Please order the maps above in which you believe to be hardest -> easiest\nPlease remember Slider Velocity (SV) should not be taken into consideration for difficulty, Only mechanical skill.",
                         value=f"{ts}{ts}{ts}{ts}{ts}{ts}\n__**Commands**__\n`-harder x x x x x x x x x x` where x is a number 0-9\n`-skip` if you want to skip this comparison and generate a new one.\n**take your time making your decision, every comparison makes a difference!**")
+        embed.set_footer(text=f"Number of comparisons you have completed: {user_data[6]}")
         return embed
 
     async def create_confirmation_embed(self, beatmaps_data, discord_id, password):

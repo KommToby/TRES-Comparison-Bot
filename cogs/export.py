@@ -1,3 +1,8 @@
+# importing the required libraries
+import gspread
+import pandas as pd
+from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 import discord
 from discord.ext import commands
 from bot import DATABASE, AUTH, ELO
@@ -17,7 +22,7 @@ class Export(commands.Cog): # must have commands.cog or this wont work
     @commands.command() # command within the cog
     async def export(self, ctx):
         if isinstance(ctx.channel, discord.channel.DMChannel):
-            if str(ctx.message.author.id) == "150313781673721856": # My discord id
+            if str(ctx.message.author.id) == "150313781673721856" or str(ctx.message.author.id) == "163125004995657728": # My discord id
                 await self.start_export(ctx)
             else:
                 await ctx.send(f'Only administrators can use this command.')
@@ -27,6 +32,25 @@ class Export(commands.Cog): # must have commands.cog or this wont work
             with open("beatmap_elos_export.txt", "w") as g:
                 comp = await self.database.get_all_comparisons()
                 beatmaps = await self.database.get_all_beatmaps()
+                # define the scope
+                scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+
+                # add credentials to the account
+                creds = ServiceAccountCredentials.from_json_keyfile_name('tres.json', scope)
+
+                # authorize the clientsheet 
+                client = gspread.authorize(creds)
+
+                # get the instance of the Spreadsheet
+                dt = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                sheet = client.open('TRES')
+                sheet.add_worksheet(title=f"{dt}", rows="1000", cols="100")
+                workspace = client.open('TRES').worksheet(f"{dt}")
+                # workspace.append_row([["a"], ["b"]])
+                # row, column
+                workspace.update_cell(1, 1, 'Beatmap')
+                workspace.update_cell(1, 2, 'ELO')
+
                 if beatmaps:
                     for b in beatmaps:
                         self.elo.addPlayer(name=b[0], rating=500)
@@ -34,11 +58,23 @@ class Export(commands.Cog): # must have commands.cog or this wont work
                     for c in comp:
                         if c[3] == '1':
                             self.elo.gameOver(winner=c[1], loser=c[2], winnerHome=False)
-                for beatmap in self.elo.ratingDict:
+                epic_array = []
+                for i, beatmap in enumerate(self.elo.ratingDict):
+                    temp_array = []
+                    temp_array.append(f"{beatmap}")
+                    temp_array.append(f"{str(self.elo.ratingDict[beatmap])}")
+                    epic_array.append(temp_array)
+
+                    # also write to file just to be safe
                     f.write(f"{beatmap}\n")
                     g.write(f"{str(self.elo.ratingDict[beatmap])}\n")
 
+                # write all the data
+                workspace.update(f"A2:B{i+2}", epic_array)
+
+
         await ctx.send(f'Elo values exported successfully')
+
 
 def setup(client):
     client.add_cog(Export(client))

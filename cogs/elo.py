@@ -22,15 +22,19 @@ class Elo(commands.Cog): # must have commands.cog or this wont work
                 await ctx.send(f'You need to link your osu id first! use `-link`')
             else:
                 if not args:
-                    await ctx.send(f'Please provide a target star rating! e.g. `-elo 5.5`')
+                    await ctx.send(f'Please provide an average target star rating comfortable for you! (between FCable and Passable) e.g. `-elo 5.5`')
                 else:
                     try:
                         sr = float(args[0])
                         if sr > 0.00:
                             if sr > 20.00:
                                 await ctx.send(f'wtf')
-                                await asyncio.sleep(3)
+                                await asyncio.sleep(2)
                                 await ctx.send(f'can u put a normal sr number in please')
+                                await asyncio.sleep(2)
+                                await ctx.send(f'do the command again')
+                                await asyncio.sleep(2)
+                                await ctx.send(f'thanks :)')
                             else:
                                 await self.database.update_SR(user_discord_id, args[0])
                                 await ctx.send(f'your elo/sr target is updated! Try doing `-start` to start map comparisons!')
