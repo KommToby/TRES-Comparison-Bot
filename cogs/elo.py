@@ -22,7 +22,7 @@ class Elo(commands.Cog): # must have commands.cog or this wont work
                 await ctx.send(f'You need to link your osu id first! use `-link`')
             else:
                 if not args:
-                    await ctx.send(f'Please provide an average target star rating comfortable for you! (between FCable and Passable) e.g. `-elo 5.5`')
+                    await ctx.send(f'Please provide an average target star rating comfortable for you! (between FCable and Passable) e.g. `-elo 5.5`\n**You should aim to have this around 1.5 - 2 stars lower than your best pass**')
                 else:
                     try:
                         sr = float(args[0])

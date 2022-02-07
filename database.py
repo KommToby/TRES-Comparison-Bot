@@ -78,6 +78,11 @@ class Database:
             (id,)
         ).fetchone()
 
+    async def get_all_users(self):
+        return self.cursor.execute(
+            "SELECT * FROM users",
+        ).fetchall()
+
     async def get_user_osu_id(self, discord_id):
         return self.cursor.execute(
             "SELECT osu_id FROM users WHERE discord_id=?",
