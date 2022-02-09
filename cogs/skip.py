@@ -18,8 +18,10 @@ class Skip(commands.Cog): # must have commands.cog or this wont work
     async def skip(self, ctx):
         if isinstance(ctx.channel, discord.channel.DMChannel):
             user_discord_id = str(ctx.message.author.id)
+            user = await self.database.get_user(user_discord_id)
             if (await self.database.get_user(user_discord_id)):
                 await self.database.update_cache(user_discord_id, "0", "")
+                print(f"User {user[2]} skipped their comparison")
                 await ctx.send(f"Comparison skipped. Starting a new comparison..")
                 await asyncio.sleep(1)
                 await suggestion(ctx, user_discord_id)

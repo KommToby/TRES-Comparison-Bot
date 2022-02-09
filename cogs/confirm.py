@@ -48,7 +48,7 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
                                     second_position = int(p)+2
                                     await self.database.add_comparison(osu_id, cache[position], cache[second_position], "1")
                                     await self.database.add_comparison(osu_id, cache[second_position], cache[position], "2")
-                                    ELO.gameOver(winner=cache[position], loser=cache[second_position], winnerHome=False)
+                                    # self.elo.gameOver(winner=cache[position], loser=cache[second_position], winnerHome=False)
                             parse_args.remove(arg)
 
                         for i, arg in enumerate(arg_array):

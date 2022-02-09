@@ -92,6 +92,8 @@ async def suggestion(ctx, user_discord_id):
 
     target_beatmaps = []
     Count = 0
+
+    # Determining the set of beatmaps that fit in the elo range
     while Count < l:
         for i, beatmap in enumerate(elo_beatmaps):
             if float(beatmap[1]) > elo_upper or float(beatmap[1]) < elo_lower:
@@ -123,27 +125,41 @@ async def suggestion(ctx, user_discord_id):
         beatmap_ids.append(b[0])
 
     # random maps that have been compared less
-    for i in range(0, 10-l):
-        beatmaps_not_added = []
-        for beatmap in all_beatmaps:
-            if beatmap[0] not in beatmap_ids:
-                beatmaps_not_added.append(beatmap)
+    beatmaps_not_added = []
+    for beatmap in all_beatmaps:
+        if beatmap[0] not in beatmap_ids and beatmap[0] not in beatmaps_not_added:
+            beatmaps_not_added.append(beatmap)
 
     beatmaps_sorted = sorted(beatmaps_not_added, key=lambda x: x[2], reverse=False)
-    dupe = []
-    dupe_maps = [beatmaps_sorted[0]]
-    dupe.append(beatmaps_sorted[0][2])
-    for i, j in enumerate(beatmaps_sorted):
-        if j[2] in dupe:
-            dupe_maps.append(j)
+    dupe_maps = [] # maps that have the same number of comparisons
+    dupe = [] # the number of times the map with the least comparisons has been compared will be stored in here
+    while len(dupe_maps) <= 10-l: # while they arent the needed number of less-compared maps in the array
+        dupe.append(beatmaps_sorted[0][2])
+        for i, j in enumerate(beatmaps_sorted):
+            if j[2] in dupe and j not in dupe_maps:
+                dupe_maps.append(j)
+                beatmaps_sorted.remove(j)
 
-    if len(dupe_maps)>=(10-l):
-        random.shuffle(dupe_maps)
-        for k, o, in enumerate(dupe_maps):
-            if k < 10-l:
-                suggested_beatmaps.append(o)
-                data = await AUTH.get_beatmap(o[0])
-                beatmaps_data.append(data)
+    if len(dupe_maps)>=(10-l): ## if there more or equal needed duplicate maps
+        while len(beatmaps_data) < 10: # make sure we're not giving the bot too many maps to compare
+
+            ## This is so we 'shuffle' maps with the same number of comparisons, to ensure that the least compares map are still guaranteed
+            used_set = []
+            value = 0
+            for q, w in enumerate(dupe_maps):
+                if q == 1:
+                    value = w[2]
+                if w[2] == value:
+                    used_set.append(w)
+                    dupe_maps.remove(w)
+
+            ## Shuffling the used set as found above, and then applying it to the list of maps the bot uses
+            random.shuffle(used_set)
+            for k, o, in enumerate(used_set):
+                if len(beatmaps_data) < 10:
+                    suggested_beatmaps.append(o)
+                    data = await AUTH.get_beatmap(o[0])
+                    beatmaps_data.append(data)
 
     else:
         for i, j in enumerate(beatmaps_sorted):
