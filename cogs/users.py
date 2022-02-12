@@ -41,12 +41,14 @@ class Users(commands.Cog): # must have commands.cog or this wont work
             if int(user[6]) > most_comparisons:
                 most_comparisons = int(user[6])
         max_name_length = max_name_length+1
+        total_comparisons = await DATABASE.get_all_comparisons()
         message_gap = " " * (max_name_length-len("Username"))
-        message_string = message_string + f"[Username{message_gap} (Elo) | Comparisons]\n"
+        message_string = message_string + f"[Username{message_gap} (Elo) | Streak | Comparisons] ({round(len(total_comparisons)/90)} total)\n"
         users = sorted(users, key=lambda x: x[4], reverse=False)
         for user in users:
             user_gap = " " * (max_name_length-len(user[2]))
-            message_string = message_string + f" {user[2]}{user_gap} ({round(float(user[4]), 1)}) | {user[6]} Cs"
+            streak_gap = " " * (len("Streak ") - len("10"))
+            message_string = message_string + f" {user[2]}{user_gap} ({round(float(user[4]), 1)}) | {user[11]}{streak_gap} | {user[6]} Cs"
             if int(user[6]) == most_comparisons:
                 message_string = message_string + f" <- Most!\n"
             else:

@@ -145,9 +145,9 @@ async def suggestion(ctx, user_discord_id):
 
             ## This is so we 'shuffle' maps with the same number of comparisons, to ensure that the least compares map are still guaranteed
             used_set = []
-            value = 0
+            value = -1
             for q, w in enumerate(dupe_maps):
-                if q == 1:
+                if q == 0:
                     value = w[2]
                 if w[2] == value:
                     used_set.append(w)

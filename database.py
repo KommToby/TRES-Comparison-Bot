@@ -15,7 +15,10 @@ class Database:
                 comparisons varchar(32),
                 confirmation varchar(16),
                 password varchar(16),
-                beatmap_order varchar(16)
+                beatmap_order varchar(16),
+                time varchar(32),
+                streak varchar(32),
+                best varchar(32)
             )
         ''')  ## Storing user data
 
@@ -130,11 +133,29 @@ class Database:
             (beatmap_id,)
         ).fetchone()
 
+    async def get_user_time(self, discord_id):
+        return self.cursor.execute(
+            "SELECT time FROM users WHERE discord_id=?",
+            (discord_id,)
+        ).fetchone()
+
+    async def get_user_streak(self, discord_id):
+        return self.cursor.execute(
+            "SELECT streak FROM users WHERE discord_id=?",
+            (discord_id,)
+        ).fetchone()
+
+    async def get_user_best(self, discord_id):
+        return self.cursor.execute(
+            "SELECT best FROM users WHERE discord_id=?",
+            (discord_id,)
+        ).fetchone()
+
     # ADDS
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
         self.cursor.execute(
-            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?)",
-            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "")
+            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "", 0, 0, 0)
         )
         self.db.commit()
 
@@ -238,6 +259,27 @@ class Database:
         self.cursor.execute(
             "UPDATE users SET beatmap_order=? WHERE discord_id=?",
             (order, discord_id)
+        )
+        self.db.commit()
+
+    async def update_time(self, discord_id, time):
+        self.cursor.execute(
+            "UPDATE users SET time=? WHERE discord_id=?",
+            (time, discord_id)
+        )
+        self.db.commit()
+
+    async def update_streak(self, discord_id, streak):
+        self.cursor.execute(
+            "UPDATE users SET streak=? WHERE discord_id=?",
+            (streak, discord_id)
+        )
+        self.db.commit()
+
+    async def update_best(self, discord_id, best):
+        self.cursor.execute(
+            "UPDATE users SET best=? WHERE discord_id=?",
+            (best, discord_id)
         )
         self.db.commit()
 

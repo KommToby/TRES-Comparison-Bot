@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from bot import DATABASE, AUTH, suggestion, ELO
 import asyncio
+import time
 
 class Confirm(commands.Cog): # must have commands.cog or this wont work
 
@@ -63,7 +64,26 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
                         await ctx.send(f"Comparison Successful. starting a new comparison..")
                         print(f"Comparison Completed By {user_data[2]}")
                         await self.database.update_order(user_discord_id, "")
-                        await asyncio.sleep(1)
+                        local_time = await self.database.get_user_time(user_discord_id)
+                        local_time = local_time[0]
+                        current_time = time.time()
+                        if (int(current_time) - int(local_time)) > 86400:
+                            if (int(current_time) - int(local_time)) > 172800:
+                                await ctx.send(f"Your streak has been set to 0 :(")
+                                await self.database.update_time(user_discord_id, current_time)
+                                await self.database.update_streak(user_discord_id, 0)
+                            else:
+                                best = await self.database.get_user_best(user_discord_id)
+                                best = best[0]
+                                streak = await self.database.get_user_streak(user_discord_id)
+                                streak = streak[0]
+                                if int(streak)+1 > int(best):
+                                    await self.database.update_best(user_discord_id, int(streak)+1)
+                                await ctx.send(f"Your daily streak is now {int(streak)+1}!")
+                                await self.database.update_time(user_discord_id, current_time)
+                                await self.database.update_streak(user_discord_id, int(streak)+1)
+
+                        await asyncio.sleep(0.25)
                         await suggestion(ctx, user_discord_id)
                     else:
                         await ctx.send(f"You dont have anything to confirm! Try doing `-start` or `-skip`")
