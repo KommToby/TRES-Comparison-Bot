@@ -27,7 +27,8 @@ class Database:
                 osu_id varchar(32) not null,
                 first_beatmap_id varchar(32),
                 second_beatmap_id varchar(32),
-                outcome varchar(16)
+                outcome varchar(16),
+                timestamp varchar(16)
             )
         ''')  # Storing comparison results after user has decided
 
@@ -155,7 +156,7 @@ class Database:
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
         self.cursor.execute(
             "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "", 0, 0, 0)
+            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "", 0, 1, 1)
         )
         self.db.commit()
 
@@ -173,10 +174,10 @@ class Database:
         )
         self.db.commit()
 
-    async def add_comparison(self, osu_id, beatmap_1_id, beatmap_2_id, outcome):
+    async def add_comparison(self, osu_id, beatmap_1_id, beatmap_2_id, outcome, timestamp):
         self.cursor.execute(
-            "INSERT INTO comparisons VALUES(?,?,?,?)",
-            (osu_id, beatmap_1_id, beatmap_2_id, outcome)
+            "INSERT INTO comparisons VALUES(?,?,?,?,?)",
+            (osu_id, beatmap_1_id, beatmap_2_id, outcome, timestamp)
         )
         self.db.commit()
 

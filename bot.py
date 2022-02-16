@@ -22,7 +22,7 @@ client = commands.Bot(command_prefix="-", case_insensitive=True, help_command=He
 DATABASE = database.Database()
 AUTH = osu_auth.OsuAuth()
 EMBED = embed.Embed()
-ELO = Elo(k=40, homefield=0) # Change this to 1/5 of the value when beta ends
+ELO = Elo(k=8, homefield=0) # Change this to 1/5 of the value when beta ends
 
 # called when bot is online
 @client.event
@@ -38,13 +38,14 @@ async def on_ready():
             await asyncio.sleep(60)
         else:
             i = 1
-        comparisons = await DATABASE.get_all_comparisons()
-        if comparisons:
-            num = (len(comparisons)/2)
-            # await client.change_presence(activity=discord.Game(name=f"{100-int(num/45)} user comparisons to go!"))
-            await client.change_presence(activity=discord.Game(name=f"{100-int(num/45)} user comparisons to go!"))
-        else:
-            pass
+            # await client.change_presence(activity=discord.Game(name=f"Phase 2 soontm"))
+            comparisons = await DATABASE.get_all_comparisons()
+            if comparisons:
+                num = (len(comparisons)/2)
+                # await client.change_presence(activity=discord.Game(name=f"{100-int(num/45)} user comparisons to go!"))
+                await client.change_presence(activity=discord.Game(name=f"{int(num/45)} Comparisons Total!"))
+            else:
+                pass
 
 
 @client.command(name="load")
@@ -65,8 +66,11 @@ async def suggestion(ctx, user_discord_id):
     comp = await DATABASE.get_all_comparisons()
     beatmaps = await DATABASE.get_all_beatmaps()
     if beatmaps:
-        for b in beatmaps:
-            ELO.addPlayer(name=b[0], rating=500)
+        for i, b in enumerate(beatmaps):
+            nelo = open("elo.txt", "r")
+            for j, line2 in enumerate(nelo):
+                if j == i:
+                    ELO.addPlayer(name=b[0], rating=float(line2[:-2]))
     if comp:
         for c in comp:
             if c[3] == '1':
@@ -88,7 +92,7 @@ async def suggestion(ctx, user_discord_id):
     elo_upper = elo + 1.5
     elo_lower = elo - 1.5
 
-    l = 0 # THIS IS WHAT IS USED TO DETERMINE HOW MANY RANDOM MAPS THERE ARE!! AT PHASE 2 PLEASE TURN THIS TO 8
+    l = 8 # THIS IS WHAT IS USED TO DETERMINE HOW MANY RANDOM MAPS THERE ARE!! AT PHASE 2 PLEASE TURN THIS TO 8
 
     target_beatmaps = []
     Count = 0

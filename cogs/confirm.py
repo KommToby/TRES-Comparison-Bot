@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from bot import DATABASE, AUTH, suggestion, ELO
 import asyncio
+from datetime import datetime
 import time
 
 class Confirm(commands.Cog): # must have commands.cog or this wont work
@@ -19,6 +20,7 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
     @commands.command() # command within the cog
     async def confirm(self, ctx, *args):
         if isinstance(ctx.channel, discord.channel.DMChannel):
+            dt = datetime.now().strftime("%d/%m %H:%M:%S")
             if not args:
                 await ctx.send(f"Usage: `-confirm 'password'`")
             elif len(args)>1:
@@ -47,8 +49,8 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
                             for k, p in enumerate(parse_args):
                                 if arg != p:
                                     second_position = int(p)+2
-                                    await self.database.add_comparison(osu_id, cache[position], cache[second_position], "1")
-                                    await self.database.add_comparison(osu_id, cache[second_position], cache[position], "2")
+                                    await self.database.add_comparison(osu_id, cache[position], cache[second_position], "1", dt)
+                                    await self.database.add_comparison(osu_id, cache[second_position], cache[position], "2", dt)
                                     # self.elo.gameOver(winner=cache[position], loser=cache[second_position], winnerHome=False)
                             parse_args.remove(arg)
 
@@ -69,9 +71,12 @@ class Confirm(commands.Cog): # must have commands.cog or this wont work
                         current_time = time.time()
                         if (int(current_time) - int(local_time)) > 86400:
                             if (int(current_time) - int(local_time)) > 172800:
-                                await ctx.send(f"Your streak has been set to 0 :(")
+                                streak = await self.database.get_user_streak(user_discord_id)
+                                streak = streak[0]
+                                if int(streak) != 0:
+                                    await ctx.send(f"Your daily streak has been reset to 1")
                                 await self.database.update_time(user_discord_id, current_time)
-                                await self.database.update_streak(user_discord_id, 0)
+                                await self.database.update_streak(user_discord_id, 1)
                             else:
                                 best = await self.database.get_user_best(user_discord_id)
                                 best = best[0]

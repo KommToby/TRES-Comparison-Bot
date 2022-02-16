@@ -53,10 +53,14 @@ class Export(commands.Cog): # must have commands.cog or this wont work
                 workspace.update_cell(1, 2, 'Name & Difficulty')
                 workspace.update_cell(1, 3, 'Current SR')
                 workspace.update_cell(1, 4, 'ELO')
+                workspace.update_cell(1, 5, 'rELO')
 
                 if beatmaps:
-                    for b in beatmaps:
-                        self.elo.addPlayer(name=b[0], rating=500)
+                    for i, b in enumerate(beatmaps):
+                        nelo = open("elo.txt", "r")
+                        for j, line2 in enumerate(nelo):
+                            if j == i:
+                                ELO.addPlayer(name=b[0], rating=float(line2[:-2]))
                 if comp:
                     for c in comp:
                         if c[3] == '1':
@@ -67,7 +71,8 @@ class Export(commands.Cog): # must have commands.cog or this wont work
                     temp_array.append(f"{beatmap}")
                     temp_array.append(f"{beatmaps[i][6]} - {beatmaps[i][7]} [{beatmaps[i][8]}]")
                     temp_array.append(f"{beatmaps[i][1]}")
-                    temp_array.append(f"{str(self.elo.ratingDict[beatmap])}")
+                    temp_array.append(f"{str(round(float(self.elo.ratingDict[beatmap]), 1))}")
+                    temp_array.append(f"{str(round(int(self.elo.ratingDict[beatmap])))}")
                     epic_array.append(temp_array)
 
                     # also write to file just to be safe
@@ -75,7 +80,7 @@ class Export(commands.Cog): # must have commands.cog or this wont work
                     g.write(f"{str(self.elo.ratingDict[beatmap])}\n")
 
                 # write all the data
-                workspace.update(f"A2:D{i+2}", epic_array)
+                workspace.update(f"A2:E{i+2}", epic_array)
 
 
         await ctx.send(f'Elo values exported successfully')
