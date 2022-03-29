@@ -28,62 +28,68 @@ class Export(commands.Cog): # must have commands.cog or this wont work
                 await ctx.send(f'Only administrators can use this command.')
 
     async def start_export(self, ctx):
-        with open("beatmap_ids.txt", "w") as f:
-            with open("beatmap_elos_export.txt", "w") as g:
-                comp = await self.database.get_all_comparisons()
-                beatmaps = await self.database.get_all_beatmaps()
-                # define the scope
-                scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        try:
+            with open("beatmap_ids.txt", "w") as f:
+                with open("beatmap_elos_export.txt", "w") as g:
+                    comp = await self.database.get_all_comparisons()
+                    beatmaps = await self.database.get_all_beatmaps()
+                    # define the scope
+                    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 
-                # add credentials to the account
-                creds = ServiceAccountCredentials.from_json_keyfile_name('tres.json', scope)
+                    # add credentials to the account
+                    creds = ServiceAccountCredentials.from_json_keyfile_name('tres.json', scope)
 
-                # authorize the clientsheet 
-                client = gspread.authorize(creds)
+                    # authorize the clientsheet 
+                    client = gspread.authorize(creds)
 
-                # get the instance of the Spreadsheet
-                dt = datetime.now().strftime("%d/%m %H:%M:%S")
-                dt = f"Dump {dt}"
-                sheet = client.open('TRES')
-                sheet.add_worksheet(title=f"{dt}", rows="1000", cols="100")
-                workspace = client.open('TRES').worksheet(f"{dt}")
-                # workspace.append_row([["a"], ["b"]])
-                # row, column
-                workspace.update_cell(1, 1, 'Beatmap')
-                workspace.update_cell(1, 2, 'Name & Difficulty')
-                workspace.update_cell(1, 3, 'Current SR')
-                workspace.update_cell(1, 4, 'ELO')
-                workspace.update_cell(1, 5, 'rELO')
+                    # get the instance of the Spreadsheet
+                    dt = datetime.now().strftime("%d/%m %H:%M:%S")
+                    dt = f"Dump {dt}"
+                    sheet = client.open('TRES')
+                    sheet.add_worksheet(title=f"{dt}", rows="1000", cols="100")
+                    workspace = client.open('TRES').worksheet(f"{dt}")
+                    # workspace.append_row([["a"], ["b"]])
+                    # row, column
+                    workspace.update_cell(1, 1, 'Beatmap')
+                    workspace.update_cell(1, 2, 'Name & Difficulty')
+                    workspace.update_cell(1, 3, 'Current SR')
+                    workspace.update_cell(1, 4, 'sELO')
+                    workspace.update_cell(1, 5, 'cELO')
 
-                if beatmaps:
-                    for i, b in enumerate(beatmaps):
-                        nelo = open("elo.txt", "r")
-                        for j, line2 in enumerate(nelo):
-                            if j == i:
-                                ELO.addPlayer(name=b[0], rating=float(line2[:-2]))
-                if comp:
-                    for c in comp:
-                        if c[3] == '1':
-                            self.elo.gameOver(winner=c[1], loser=c[2], winnerHome=False)
-                epic_array = []
-                for i, beatmap in enumerate(self.elo.ratingDict):
-                    temp_array = []
-                    temp_array.append(f"{beatmap}")
-                    temp_array.append(f"{beatmaps[i][6]} - {beatmaps[i][7]} [{beatmaps[i][8]}]")
-                    temp_array.append(f"{beatmaps[i][1]}")
-                    temp_array.append(f"{str(round(float(self.elo.ratingDict[beatmap]), 1))}")
-                    temp_array.append(f"{str(round(int(self.elo.ratingDict[beatmap])))}")
-                    epic_array.append(temp_array)
+                    eloarray = []
+                    if beatmaps:
+                        for i, b in enumerate(beatmaps):
+                            nelo = open("elo.txt", "r")
+                            for j, line2 in enumerate(nelo):
+                                if j == i:
+                                    eloarray.append(line2[:-2])
+                                    ELO.addPlayer(name=b[0], rating=float(line2[:-2]))
+                    if comp:
+                        for c in comp:
+                            if c[3] == '1':
+                                self.elo.gameOver(winner=c[1], loser=c[2], winnerHome=False)
+                    epic_array = []
+                    for i, beatmap in enumerate(self.elo.ratingDict):
+                        temp_array = []
+                        temp_array.append(f"{beatmap}")
+                        temp_array.append(f"{beatmaps[i][6]} - {beatmaps[i][7]} [{beatmaps[i][8]}]")
+                        temp_array.append(f"{beatmaps[i][1]}")
+                        temp_array.append(f"{str(round(float(eloarray[i]), 1))}")
+                        temp_array.append(f"{str(round(int(self.elo.ratingDict[beatmap])))}")
+                        epic_array.append(temp_array)
 
-                    # also write to file just to be safe
-                    f.write(f"{beatmap}\n")
-                    g.write(f"{str(self.elo.ratingDict[beatmap])}\n")
+                        # also write to file just to be safe
+                        f.write(f"{beatmap}\n")
+                        g.write(f"{str(self.elo.ratingDict[beatmap])}\n")
 
-                # write all the data
-                workspace.update(f"A2:E{i+2}", epic_array)
+                    # write all the data
+                    workspace.update(f"A2:E{i+2}", epic_array)
 
 
-        await ctx.send(f'Elo values exported successfully')
+            await ctx.send(f'Elo values exported successfully')
+        except:
+            await ctx.send(f'An error occured. Please try again')
+
 
 
 def setup(client):

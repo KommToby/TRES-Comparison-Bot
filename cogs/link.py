@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from bot import DATABASE, AUTH
+from bot import DATABASE, AUTH, client
 
 class Link(commands.Cog): # must have commands.cog or this wont work
 
@@ -30,8 +30,10 @@ class Link(commands.Cog): # must have commands.cog or this wont work
                             if not(user_database): # If the user has not linked before, add a new user to the database AND add a cache
                                 await self.database.add_user(discord_id, str(args[0]), user_data['username'], user_data['statistics']['global_rank'], average_sr, "", 0)
                                 await self.database.add_cache(discord_id)
-                                await ctx.send(f"user {user_data['username']} has successfully been linked to your discord account! Try doing `-elo` before starting your comparisons!")
+                                await ctx.send(f"user {user_data['username']} has successfully been linked to your discord account! Please now wait for an admin to verify you, I will message you to let you know when you have been verified :)")
                                 print(f"Added {user_data['username']} as a user")
+                                send_channel = self.client.get_channel(898907991653376072)
+                                await send_channel.send(f"{user_data['username']} just linked their account and is ready for verification ({user_data['user_id']})")
                             else: # Otherwise, update the users data in the database to the new osu account
                                 await self.database.update_user(discord_id, str(args[0]), user_data['username'], user_data['statistics']['global_rank'], average_sr, "")
                                 await ctx.send(f"user {user_data['username']} is now the osu! account linked to your discord account! Try doing `-elo` before starting your comparisons!")

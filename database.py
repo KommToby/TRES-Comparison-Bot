@@ -18,7 +18,8 @@ class Database:
                 beatmap_order varchar(16),
                 time varchar(32),
                 streak varchar(32),
-                best varchar(32)
+                best varchar(32),
+                verified varchar(32)
             )
         ''')  ## Storing user data
 
@@ -79,6 +80,12 @@ class Database:
     async def get_user(self, id):
         return self.cursor.execute(
             "SELECT * FROM users WHERE discord_id=?",
+            (id,)
+        ).fetchone()
+
+    async def get_user_from_osu_id(self, id):
+        return self.cursor.execute(
+            "SELECT * FROM users WHERE osu_id=?",
             (id,)
         ).fetchone()
 
@@ -155,8 +162,8 @@ class Database:
     # ADDS
     async def add_user(self, discord_id, user_id, username, rank, sr, playstyle, comparisons):
         self.cursor.execute(
-            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "", 0, 1, 1)
+            "INSERT INTO users VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (discord_id, user_id, username, rank, sr, playstyle, comparisons, "0", "", "", 0, 1, 1, "0")
         )
         self.db.commit()
 
@@ -281,6 +288,13 @@ class Database:
         self.cursor.execute(
             "UPDATE users SET best=? WHERE discord_id=?",
             (best, discord_id)
+        )
+        self.db.commit()
+
+    async def verify_user(self, osu_id):
+        self.cursor.execute(
+            "UPDATE users SET verified=? WHERE osu_id=?",
+            ("1", osu_id)
         )
         self.db.commit()
 

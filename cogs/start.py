@@ -21,14 +21,19 @@ class Start(commands.Cog): # must have commands.cog or this wont work
             if not(await self.database.get_user(user_discord_id)):
                 await ctx.send(f'You need to link your osu id first! use `-link`')
             else:
-                cache = await self.database.get_cache(user_discord_id)
-                if cache:
-                    if cache[1] != "0":
-                        await ctx.send(f"you already have a comparison! if you want to skip it, use `-skip`")
+                user_data = await self.database.get_user(user_discord_id)
+                if user_data[13] == 1:
+                    cache = await self.database.get_cache(user_discord_id)
+                    if cache:
+                        if cache[1] != "0":
+                            await ctx.send(f"you already have a comparison! if you want to skip it, use `-skip`")
+                        else:
+                            await self.suggestion(ctx, user_discord_id)
                     else:
                         await self.suggestion(ctx, user_discord_id)
                 else:
-                    await self.suggestion(ctx, user_discord_id)
+                    print(f'user tried to -start but didnt have permissions')
+                    await ctx.send(f'You havent been verified by an Admin yet. Please wait, or contact a coordinator on the discord')
         else:
             await ctx.send(f'<@{ctx.message.author.id}> Please use commands in DMs with me to prevent spam!')
 
