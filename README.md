@@ -8,6 +8,7 @@ TRES (Taiko RR ELO System) Is a project co-ordinated by Lawtron and mangomizer t
 `-harder`: Picks the order of maps from hardest to easiest  
 `-skip`: Skips the current comparison and generates a new one  
 `-confirm`: Confirms that the maps you have selected are in the right order  
+`-elo`: Sets your target star rating for maps you want to compare (after ELO)
 
 ## Bot Example
 ![](https://i.imgur.com/NygrhSk.png)
